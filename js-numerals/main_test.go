@@ -35,3 +35,7 @@ func TestFourDigit(t *testing.T) {
 func TestNineDigit(t *testing.T) {
 	testNumberConverting(t, 123456789, "one hundred and twenty-three million and four hundred and fifty-six thousand and seven hundred and eighty-nine")
 }
+
+func TestMinusNumber(t *testing.T) {
+	testNumberConverting(t, -123, "minus one hundred and twenty-three")
+}
