@@ -47,16 +47,26 @@ func divmod(numerator, denominator int) (quotient, remainder int) {
 }
 
 func number_to_string(number int) string {
-	if number > 19 {
+	result := ""
+	if number > 100 {
+		quotient, remainder := divmod(number, 100)
+		result = fmt.Sprintf("%s %s", number_to_string(quotient), "hundred")
+		if remainder != 0 {
+			result += " and "
+			number -= quotient * 100
+			result += number_to_string(number)
+		}
+	} else if number > 19 {
 		_, remainder := divmod(number, 10)
 		if remainder != 0 {
-			return fmt.Sprintf("%s-%s", tens[number-remainder], smallnumbers[remainder])
+			result += fmt.Sprintf("%s-%s", tens[number-remainder], smallnumbers[remainder])
 		} else {
-			return fmt.Sprintf("%s", tens[number-remainder])
+			result += fmt.Sprintf("%s", tens[number-remainder])
 		}
 	} else {
-		return smallnumbers[number]
+		result += smallnumbers[number]
 	}
+	return result
 }
 
 func main() {
