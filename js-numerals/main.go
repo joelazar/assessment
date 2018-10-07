@@ -38,6 +38,13 @@ var (
 		80: "eighty",
 		90: "ninety",
 	}
+
+	scalenumbers = map[int]string{
+		100:        "hundred",
+		1000:       "thousand",
+		1000000:    "million",
+		1000000000: "billion",
+	}
 )
 
 func divmod(numerator, denominator int) (quotient, remainder int) {
@@ -46,16 +53,27 @@ func divmod(numerator, denominator int) (quotient, remainder int) {
 	return
 }
 
+func scalenumber_to_string(number int, scale int) string {
+	quotient, remainder := divmod(number, scale)
+	result := fmt.Sprintf("%s %s", number_to_string(quotient), scalenumbers[scale])
+	if remainder != 0 {
+		result += " and "
+		number -= quotient * scale
+		result += number_to_string(number)
+	}
+	return result
+}
+
 func number_to_string(number int) string {
 	result := ""
-	if number > 100 {
-		quotient, remainder := divmod(number, 100)
-		result = fmt.Sprintf("%s %s", number_to_string(quotient), "hundred")
-		if remainder != 0 {
-			result += " and "
-			number -= quotient * 100
-			result += number_to_string(number)
-		}
+	if number > 1000000000 {
+		result += scalenumber_to_string(number, 1000000000)
+	} else if number > 1000000 {
+		result += scalenumber_to_string(number, 1000000)
+	} else if number > 1000 {
+		result += scalenumber_to_string(number, 1000)
+	} else if number > 100 {
+		result += scalenumber_to_string(number, 100)
 	} else if number > 19 {
 		_, remainder := divmod(number, 10)
 		if remainder != 0 {
@@ -63,6 +81,9 @@ func number_to_string(number int) string {
 		} else {
 			result += fmt.Sprintf("%s", tens[number-remainder])
 		}
+	} else if number < 0 {
+		result += "minus "
+		result += number_to_string(-1 * number)
 	} else {
 		result += smallnumbers[number]
 	}

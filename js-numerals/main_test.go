@@ -31,3 +31,15 @@ func TestHigherThreeDigit(t *testing.T) {
 		t.Error("Expected nine hundred and eighty-two, got ", result)
 	}
 }
+
+func TestFourDigit(t *testing.T) {
+	if result := number_to_string(1001); "one thousand and one" != result {
+		t.Error("Expected one thousand and one, got ", result)
+	}
+}
+
+func TestNineDigit(t *testing.T) {
+	if result := number_to_string(123456789); "one hundred and twenty-three million and four hundred and fifty-six thousand and seven hundred and eighty-nine" != result {
+		t.Error("Expected one hundred and twenty-three million and four hundred and fifty-six thousand and seven hundred and eighty-nine, got ", result)
+	}
+}
