@@ -38,3 +38,10 @@ Removes a todo from the collection.
 1. Save all of the todos in a JSON file, if any modification happens. Load the collection from this file when the server restarts
 2. Remove todos that is done for 5 minutes
 3. Create unit tests for the API
+
+
+=============================
+
+go get -t
+
+go test
