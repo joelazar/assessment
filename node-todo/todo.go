@@ -86,7 +86,7 @@ func (t *Todos) lookForId(id string) (bool, int, Todo) {
 }
 
 func (t *Todos) addTodo(item Todo) error {
-	if err := t.validateNewTodoItem(item); err != nil {
+	if err := t.validateTodoItem(item); err != nil {
 		fmt.Println("Failed to add todo item to list!")
 		return err
 	}
@@ -95,7 +95,7 @@ func (t *Todos) addTodo(item Todo) error {
 	return nil
 }
 
-func (t *Todos) validateNewTodoItem(item Todo) error {
+func (t *Todos) validateTodoItem(item Todo) error {
 	if reflect.DeepEqual(item, Todo{}) {
 		return errors.New("Todo is an empty struct.")
 	}
@@ -125,6 +125,66 @@ func (t *Todos) isIdUnique(id string) bool {
 		return false
 	}
 	return true
+}
+
+func (t *Todos) getAll() []byte {
+	todoJson, _ := json.Marshal(t)
+	return prettyPrint(todoJson)
+}
+
+func (t *Todos) getById(id string) ([]byte, error) {
+	found, _, todo := t.lookForId(id)
+	if found {
+		todoJson, _ := json.Marshal(todo)
+		return prettyPrint(todoJson), nil
+	} else {
+		return []byte{}, errors.New("Todo item not found.")
+	}
+}
+
+func (t *Todos) CreateTodoItem(new_todo Todo) ([]byte, error) {
+	todo, err := CreateTodo(new_todo.Text, new_todo.Priority, new_todo.Done)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	err = t.addTodo(todo)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	todoJson, _ := json.Marshal(t.TodoArray[len(t.TodoArray)-1]) // the id created by CreateTodo can be different from the id which is in the database
+	return prettyPrint(todoJson), nil
+}
+
+func (t *Todos) ModifyTodo(id string, modified_todo Todo) ([]byte, error) {
+	found, index, todo := t.lookForId(id)
+	if found {
+		// TODO - do not always change every field of the item
+		todo.Done = modified_todo.Done
+		todo.Text = modified_todo.Text
+		todo.Priority = modified_todo.Priority
+		if err := TodoValidation(todo.Text, todo.Priority); err != nil {
+			return []byte{}, err
+		}
+		t.TodoArray[index] = todo
+		todoJson, _ := json.Marshal(todo)
+		return prettyPrint(todoJson), nil
+	} else {
+		return []byte{}, errors.New("Todo item not found.")
+	}
+}
+
+func (t *Todos) deleteById(id string) error {
+	found, index, _ := t.lookForId(id)
+	if found {
+		t.TodoArray = append(t.TodoArray[:index], t.TodoArray[index+1:]...)
+		return nil
+	} else {
+		return errors.New("Todo item not found.")
+	}
 }
 
 // Support functions
