@@ -28,7 +28,7 @@ func CompareFiles(file1, file2 string) bool {
 
 func TestCreateSimpleTodo(t *testing.T) {
 	assert := assert.New(t)
-	todo1, err := CreateTodo("task")
+	todo1, err := CreateTodo("task", 0, false)
 
 	assert.Equal(nil, err)
 	assert.Equal("task", todo1.Text)
@@ -38,7 +38,7 @@ func TestCreateSimpleTodo(t *testing.T) {
 
 func TestCreateSimpleTodoWithPriority(t *testing.T) {
 	assert := assert.New(t)
-	todo1, err := CreateTodoWithPriority("task", 1)
+	todo1, err := CreateTodo("task", 1, false)
 
 	assert.Equal(nil, err)
 	assert.Equal("task", todo1.Text)
@@ -48,7 +48,7 @@ func TestCreateSimpleTodoWithPriority(t *testing.T) {
 
 func TestInvalidPriorityTodo(t *testing.T) {
 	assert := assert.New(t)
-	todo1, err := CreateTodoWithPriority("task", 24)
+	todo1, err := CreateTodo("task", 24, false)
 
 	assert.NotEqual(nil, err)
 	assert.Equal(Todo{}, todo1)
@@ -56,7 +56,7 @@ func TestInvalidPriorityTodo(t *testing.T) {
 
 func TestInvalidDescriptionTodo(t *testing.T) {
 	assert := assert.New(t)
-	todo1, err := CreateTodoWithPriority("áéő Ups", 2)
+	todo1, err := CreateTodo("áéő Ups", 2, true)
 
 	assert.NotEqual(nil, err)
 	assert.Equal(Todo{}, todo1)
@@ -92,12 +92,38 @@ func TestWriteFile(t *testing.T) {
 	todos.readFromFile()
 	assert.Equal(0, len(todos.TodoArray), "This file should not exist, therefore todo array should be empty")
 
-	todo, _ := CreateTodo("Task")
+	todo, _ := CreateTodo("Task", 0, false)
 	todos.addTodo(todo)
 
-	todo, _ = CreateTodoWithPriority("Very important task", 5)
+	todo, _ = CreateTodo("Very important task", 5, false)
 	todos.addTodo(todo)
 
 	todos.writeToFile()
 	assert.True(CompareFiles("tst/testwritefile.json", "tst/testwritefile_expected.json"))
+}
+
+func TestAddInvalidTodotoList(t *testing.T) {
+	assert := assert.New(t)
+	todos := Todos{}
+
+	todo := Todo{"1234", "Task", 0, false}
+	err := todos.addTodo(todo)
+	assert.NotEqual(nil, err)
+
+	todo = Todo{"1234", "Ta32sk", 1, false}
+	todos.addTodo(todo)
+	assert.NotEqual(nil, err)
+}
+
+func TestAddSameTaskItemTwice(t *testing.T) {
+	assert := assert.New(t)
+	todos := Todos{}
+
+	todo := Todo{"1234", "Task", 1, false}
+	todos.addTodo(todo)
+	assert.Equal("1234", todos.TodoArray[0].Id)
+	err := todos.addTodo(todo)
+	assert.Equal(nil, err)
+	assert.Equal("1234", todos.TodoArray[0].Id)
+	assert.Equal("1234", todos.TodoArray[1].Id)
 }
