@@ -1,0 +1,22 @@
+{
+  "todos": [
+    {
+      "id": "16390851413506644199",
+      "text": "Priority task",
+      "priority": 5,
+      "done": false
+    },
+    {
+      "id": "2065259010723891734",
+      "text": "Less priority task",
+      "priority": 4,
+      "done": false
+    },
+    {
+      "id": "1823758784994838383",
+      "text": "Simple task, which is done already",
+      "priority": 2,
+      "done": true 
+    }
+  ]
+}
