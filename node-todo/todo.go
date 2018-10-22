@@ -34,6 +34,7 @@ func CreateTodos() Todos {
 	cancelChannel = make(chan string, 1)
 	t := Todos{}
 	t.readFromFile()
+	t.writeToFile()
 	return t
 }
 
@@ -74,6 +75,7 @@ func (t Todos) writeToFile() error {
 func (t *Todos) readFromFile() error {
 	jsonFile, err := os.Open(dbFile)
 	if err != nil {
+		t.TodoArray = make([]Todo, 0)
 		return err
 	}
 

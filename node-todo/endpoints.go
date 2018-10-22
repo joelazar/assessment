@@ -43,9 +43,7 @@ func HttpCreateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func HttpGetTodo(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(*r)
 	params := mux.Vars(r)
-	fmt.Println(params)
 	log.Printf("GET /todos/%s received - look for given id in database", params["id"])
 	response, err := todos.getById(params["id"])
 	if err != nil {

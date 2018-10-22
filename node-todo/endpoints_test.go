@@ -70,7 +70,7 @@ func TestGetByIdNotFound(t *testing.T) {
 func TestModifyById(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	todos.addTodo(Todo{"1234", "Task", 1, false})
 	todos.addTodo(Todo{"5678", "Second Task", 4, false})
@@ -90,7 +90,7 @@ func TestModifyById(t *testing.T) {
 func TestModifyByIdNotFound(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	todos.addTodo(Todo{"1234", "Task", 1, false})
 	todos.addTodo(Todo{"5678", "Second Task", 4, false})
@@ -110,7 +110,7 @@ func TestModifyByIdNotFound(t *testing.T) {
 func TestCreateNewTodo(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	payload := []byte(`{"text":"New Task","priority":5,"done":false}`)
 	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer(payload))
@@ -128,7 +128,7 @@ func TestCreateNewTodo(t *testing.T) {
 func TestCreateNewTodoWithId(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	payload := []byte(`{"id":"12341234","text":"New Task","priority":5,"done":false}`)
 	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer(payload))
@@ -146,7 +146,7 @@ func TestCreateNewTodoWithId(t *testing.T) {
 func TestCreateNewTodoInvalidDescription(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	payload := []byte(`{"id":"12341234","text":"123 Task","priority":3,"done":false}`)
 	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer(payload))
@@ -164,7 +164,7 @@ func TestCreateNewTodoInvalidDescription(t *testing.T) {
 func TestCreateNewTodoInvalidPriority(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	payload := []byte(`{"id":"12341234","text":"Task","priority":99,"done":false}`)
 	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer(payload))
@@ -182,7 +182,7 @@ func TestCreateNewTodoInvalidPriority(t *testing.T) {
 func TestCreateNewTodoInvalidDone(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	payload := []byte(`{"id":"12341234","text":"Task","priority":3,"done":"not bool"}`)
 	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer(payload))
@@ -200,7 +200,7 @@ func TestCreateNewTodoInvalidDone(t *testing.T) {
 func TestDeleteTodo(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	todos.addTodo(Todo{"1234", "Task", 1, false})
 	todos.addTodo(Todo{"5678", "Second Task", 4, false})
@@ -220,7 +220,7 @@ func TestDeleteTodo(t *testing.T) {
 func TestDeleteTodoNotFound(t *testing.T) {
 	assert := assert.New(t)
 	dbFile = "tst/tempdb.json"
-	defer os.Remove("tst/tempdb.json") // remove the test file after this test finished
+	defer os.Remove(dbFile) // remove the test file after this test finished
 	todos = CreateTodos()
 	todos.addTodo(Todo{"1234", "Task", 1, false})
 	todos.addTodo(Todo{"5678", "Second Task", 4, false})
