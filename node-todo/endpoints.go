@@ -8,6 +8,17 @@ import (
 	"net/http"
 )
 
+var router *mux.Router
+
+func initRouter() {
+	router = mux.NewRouter()
+	router.HandleFunc("/todos", HttpGetAll).Methods("GET")
+	router.HandleFunc("/todos", HttpCreateTodo).Methods("POST")
+	router.HandleFunc("/todos/{id}", HttpGetTodo).Methods("GET")
+	router.HandleFunc("/todos/{id}", HttpModifyTodo).Methods("PUT")
+	router.HandleFunc("/todos/{id}", HttpDeleteTodo).Methods("DELETE")
+}
+
 func HttpGetAll(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET /todos received - query all todo items")
 	w.Header().Set("Content-Type", "application/json")
@@ -32,7 +43,9 @@ func HttpCreateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func HttpGetTodo(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(*r)
 	params := mux.Vars(r)
+	fmt.Println(params)
 	log.Printf("GET /todos/%s received - look for given id in database", params["id"])
 	response, err := todos.getById(params["id"])
 	if err != nil {

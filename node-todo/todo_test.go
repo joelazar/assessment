@@ -119,10 +119,8 @@ func TestAddSameTaskItemTwice(t *testing.T) {
 	assert := assert.New(t)
 	todos := Todos{}
 
-	todo := Todo{"1234", "Task", 1, false}
-	todos.addTodo(todo)
-	assert.Equal("1234", todos.TodoArray[0].Id)
-	err := todos.addTodo(todo)
+	todos.addTodo(Todo{"1234", "Task", 1, false})
+	err := todos.addTodo(Todo{"1234", "Task", 1, false})
 	assert.Equal(nil, err)
 	assert.Equal("1234", todos.TodoArray[0].Id)
 	assert.Equal("1235", todos.TodoArray[1].Id)

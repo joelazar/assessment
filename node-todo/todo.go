@@ -56,11 +56,11 @@ func CreateTodo(text string, priority int, done bool) (Todo, error) {
 
 func TodoValidation(text string, priority int) error {
 	if !OnlyEnglishLetters(text) {
-		return errors.New("Task description does include non-English letter")
+		return errors.New("Task description does include non-English letter.")
 	}
 
 	if priority < 1 || priority > 5 {
-		return errors.New("Task's priority is invalid")
+		return errors.New("Task's priority is invalid.")
 	}
 
 	return nil
