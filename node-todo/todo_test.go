@@ -1,7 +1,6 @@
 package main
 
 import (
-	//	"fmt"
 	"bytes"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -65,8 +64,8 @@ func TestInvalidDescriptionTodo(t *testing.T) {
 func TestReadFile(t *testing.T) {
 	assert := assert.New(t)
 
-	todos := Todos{dbFile: "tst/testreadfile.json"}
-	todos.readFromFile()
+	dbFile = "tst/testreadfile.json"
+	todos := CreateTodos()
 
 	assert.Equal("16390851413506644199", todos.TodoArray[0].Id)
 	assert.Equal("Priority task", todos.TodoArray[0].Text)
@@ -86,7 +85,8 @@ func TestReadFile(t *testing.T) {
 
 func TestWriteFile(t *testing.T) {
 	assert := assert.New(t)
-	todos := Todos{dbFile: "tst/testwritefile.json"}
+	dbFile = "tst/testwritefile.json"
+	todos := CreateTodos()
 	defer os.Remove("tst/testwritefile.json") // remove the test file after this test finished
 
 	todos.readFromFile()
@@ -125,5 +125,5 @@ func TestAddSameTaskItemTwice(t *testing.T) {
 	err := todos.addTodo(todo)
 	assert.Equal(nil, err)
 	assert.Equal("1234", todos.TodoArray[0].Id)
-	assert.Equal("1234", todos.TodoArray[1].Id)
+	assert.Equal("1235", todos.TodoArray[1].Id)
 }

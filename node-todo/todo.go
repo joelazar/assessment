@@ -12,9 +12,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var IsLetter = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
+
+var cancelChannel chan string
 
 type Todo struct {
 	Id       string `json:"id"`
@@ -25,7 +28,13 @@ type Todo struct {
 
 type Todos struct {
 	TodoArray []Todo `json:"todos"`
-	dbFile    string
+}
+
+func CreateTodos() Todos {
+	cancelChannel = make(chan string, 1)
+	t := Todos{}
+	t.readFromFile()
+	return t
 }
 
 func CreateTodo(text string, priority int, done bool) (Todo, error) {
@@ -59,11 +68,11 @@ func TodoValidation(text string, priority int) error {
 
 func (t Todos) writeToFile() error {
 	todoJson, _ := json.Marshal(t)
-	return ioutil.WriteFile(t.dbFile, prettyPrint(todoJson), 0644)
+	return ioutil.WriteFile(dbFile, prettyPrint(todoJson), 0644)
 }
 
 func (t *Todos) readFromFile() error {
-	jsonFile, err := os.Open(t.dbFile)
+	jsonFile, err := os.Open(dbFile)
 	if err != nil {
 		return err
 	}
@@ -86,8 +95,7 @@ func (t *Todos) lookForId(id string) (bool, int, Todo) {
 }
 
 func (t *Todos) addTodo(item Todo) error {
-	if err := t.validateTodoItem(item); err != nil {
-		fmt.Println("Failed to add todo item to list!")
+	if err := t.validateTodoItem(&item); err != nil {
 		return err
 	}
 
@@ -95,7 +103,7 @@ func (t *Todos) addTodo(item Todo) error {
 	return nil
 }
 
-func (t *Todos) validateTodoItem(item Todo) error {
+func (t *Todos) validateTodoItem(item *Todo) error {
 	if reflect.DeepEqual(item, Todo{}) {
 		return errors.New("Todo is an empty struct.")
 	}
@@ -105,8 +113,7 @@ func (t *Todos) validateTodoItem(item Todo) error {
 	}
 
 	if !t.isIdUnique(item.Id) {
-		fmt.Println("Id is not unique, let's give it another try until we find a free id.")
-		t.reserveNewId(&item.Id)
+		t.reserveNewId(&(item.Id)) // let's give it another try until we find a free id
 	}
 
 	return nil
@@ -156,21 +163,44 @@ func (t *Todos) CreateTodoItem(new_todo Todo) ([]byte, error) {
 	}
 
 	todoJson, _ := json.Marshal(t.TodoArray[len(t.TodoArray)-1]) // the id created by CreateTodo can be different from the id which is in the database
+	t.writeToFile()
 	return prettyPrint(todoJson), nil
 }
 
 func (t *Todos) ModifyTodo(id string, modified_todo Todo) ([]byte, error) {
 	found, index, todo := t.lookForId(id)
 	if found {
-		// TODO - do not always change every field of the item
+		if err := TodoValidation(modified_todo.Text, modified_todo.Priority); err != nil {
+			return []byte{}, err
+		}
+
+		if modified_todo.Done && !todo.Done {
+			go func() {
+				for {
+					select {
+					case id := <-cancelChannel:
+						if todo.Id == id {
+							fmt.Printf("Cancel thread for %s.", todo.Id)
+							break
+						}
+					case <-time.After(5 * time.Minute):
+						doneChannel <- todo.Id
+						break
+					}
+				}
+			}()
+		} else if !modified_todo.Done && todo.Done {
+			cancelChannel <- todo.Id
+		}
+
 		todo.Done = modified_todo.Done
 		todo.Text = modified_todo.Text
 		todo.Priority = modified_todo.Priority
-		if err := TodoValidation(todo.Text, todo.Priority); err != nil {
-			return []byte{}, err
-		}
+
 		t.TodoArray[index] = todo
 		todoJson, _ := json.Marshal(todo)
+
+		t.writeToFile()
 		return prettyPrint(todoJson), nil
 	} else {
 		return []byte{}, errors.New("Todo item not found.")
@@ -181,6 +211,7 @@ func (t *Todos) deleteById(id string) error {
 	found, index, _ := t.lookForId(id)
 	if found {
 		t.TodoArray = append(t.TodoArray[:index], t.TodoArray[index+1:]...)
+		t.writeToFile()
 		return nil
 	} else {
 		return errors.New("Todo item not found.")
