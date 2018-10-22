@@ -18,6 +18,7 @@ func readBody(resp *http.Response) string {
 func initMainTest() {
 	go func() {
 		dbFile = "tst/tempdb.json"
+		removePeriod = 1 * time.Second
 		startMain()
 	}()
 	time.Sleep(1 * time.Second) // let's wait for main to bind for localhost:8000
@@ -26,7 +27,6 @@ func initMainTest() {
 func TestMainBasicFunctions(t *testing.T) {
 	assert := assert.New(t)
 	initMainTest()
-	defer stopMain()
 	file, _ := os.Open(dbFile)
 
 	resp, _ := http.Get("http://127.0.0.1:8000/todos")
@@ -69,4 +69,26 @@ func TestMainBasicFunctions(t *testing.T) {
 	assert.Equal(http.StatusOK, resp.StatusCode)
 	assert.Equal("", readBody(resp))
 	assert.True(CompareFiles("tst/empty-database.json", dbFile), "Database file should empty after delete operation.")
+}
+
+func TestMainDeleteDone(t *testing.T) {
+	assert := assert.New(t)
+
+	postBody := []byte(`{"text":"First Task","priority":5,"done":false}`)
+	resp, _ := http.Post("http://127.0.0.1:8000/todos", "application/json", bytes.NewBuffer(postBody))
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	client := http.Client{}
+
+	putBody := []byte(`{"text":"First Task","priority":5,"done":true}`)
+	req, _ := http.NewRequest(http.MethodPut, "http://127.0.0.1:8000/todos/16882564041262248690", bytes.NewBuffer(putBody))
+	req.Header.Set("Content-Type", "application/json")
+	resp, _ = client.Do(req)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	time.Sleep(2 * time.Second) // let's wait for done task to be deleted
+
+	resp, _ = http.Get("http://127.0.0.1:8000/todos")
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	assert.Equal("{\n  \"todos\": []\n}", readBody(resp))
 }

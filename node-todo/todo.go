@@ -27,7 +27,8 @@ type Todo struct {
 }
 
 type Todos struct {
-	TodoArray []Todo `json:"todos"`
+	TodoArray   []Todo `json:"todos"`
+	doneChannel chan string
 }
 
 func CreateTodos() Todos {
@@ -182,12 +183,12 @@ func (t *Todos) ModifyTodo(id string, modified_todo Todo) ([]byte, error) {
 					select {
 					case id := <-cancelChannel:
 						if todo.Id == id {
-							fmt.Printf("Cancel thread for %s.", todo.Id)
+							fmt.Printf("Cancel thread for %s.\n", todo.Id)
 							break
 						}
-					case <-time.After(5 * time.Minute):
+					case <-time.After(removePeriod):
 						doneChannel <- todo.Id
-						break
+						return
 					}
 				}
 			}()

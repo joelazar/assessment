@@ -15,6 +15,7 @@ var (
 	todos         Todos
 	doneChannel   chan string
 	signalChannel chan os.Signal
+	removePeriod  time.Duration
 )
 
 func stopMain() {
@@ -23,14 +24,14 @@ func stopMain() {
 
 func startMain() {
 	var wait time.Duration
-
-	doneChannel := make(chan string, 1)
+	doneChannel = make(chan string, 1)
 	signalChannel = make(chan os.Signal, 1)
 	signal.Notify(signalChannel, os.Interrupt)
 
 	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish")
 	flag.Parse()
 	todos = CreateTodos()
+	initRouter()
 
 	srv := &http.Server{
 		Handler:      router,
@@ -65,5 +66,6 @@ func startMain() {
 
 func main() {
 	dbFile = "todo-database.json"
+	removePeriod = 300 * time.Second
 	startMain()
 }
