@@ -27,8 +27,7 @@ type Todo struct {
 }
 
 type Todos struct {
-	TodoArray   []Todo `json:"todos"`
-	doneChannel chan string
+	TodoArray []Todo `json:"todos"`
 }
 
 func CreateTodos() Todos {

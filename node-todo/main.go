@@ -18,10 +18,6 @@ var (
 	removePeriod  time.Duration
 )
 
-func stopMain() {
-	signalChannel <- os.Interrupt
-}
-
 func startMain() {
 	var wait time.Duration
 	doneChannel = make(chan string, 1)
@@ -66,6 +62,6 @@ func startMain() {
 
 func main() {
 	dbFile = "todo-database.json"
-	removePeriod = 300 * time.Second
+	removePeriod = 5 * time.Minute
 	startMain()
 }

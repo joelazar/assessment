@@ -39,9 +39,3 @@ Removes a todo from the collection.
 2. Remove todos that is done for 5 minutes
 3. Create unit tests for the API
 
-
-=============================
-
-go get -t
-
-go test
