@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Prerequisites for this script: sh, curl and go
+#
 
 start_application() {
   echo Start application
