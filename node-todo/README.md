@@ -39,3 +39,20 @@ Removes a todo from the collection.
 2. Remove todos that is done for 5 minutes
 3. Create unit tests for the API
 
+---
+
+### For downloading go dependency packages
+
+```
+go get -t
+```
+### For building the application
+
+```
+go build
+```
+### For executing the unit tests
+
+```
+go test -v
+```
