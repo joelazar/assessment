@@ -73,13 +73,14 @@ func (t Todos) writeToFile() error {
 }
 
 func (t *Todos) readFromFile() error {
-	jsonFile, err := os.Open(dbFile)
+	file, err := os.Open(dbFile)
+	defer file.Close()
 	if err != nil {
 		t.TodoArray = make([]Todo, 0)
 		return err
 	}
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
 	}

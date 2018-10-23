@@ -20,6 +20,7 @@ var (
 
 func startMain() {
 	var wait time.Duration
+
 	doneChannel = make(chan string, 1)
 	signalChannel = make(chan os.Signal, 1)
 	signal.Notify(signalChannel, os.Interrupt)
@@ -50,11 +51,13 @@ func startMain() {
 			log.Println("shutting down")
 			os.Exit(0)
 		case id := <-doneChannel:
+			mutex.Lock()
 			if err := todos.deleteById(id); err == nil {
 				log.Printf("Todo item with %s id was deleted due it was done for a certain time now.\n", id)
 			} else {
 				log.Printf("Failed to delete todo item with %s id, error: %v.\n", id, err)
 			}
+			mutex.Unlock()
 			continue
 		}
 	}

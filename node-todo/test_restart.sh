@@ -4,14 +4,14 @@ start_application() {
   echo Start application
   ./node-todo &>/dev/null &
   bgpid=$!
-  sleep 1
+  sleep 0.5
 }
 
 stop_application() {
   echo Stop application
-  ./node-todo &>/dev/null &
-  bgpid=$!
-  sleep 1
+  kill $bgpid
+  wait $bgpid &>/dev/null
+  sleep 0.5
 }
 
 echo Build go application

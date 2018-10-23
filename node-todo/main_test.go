@@ -28,6 +28,7 @@ func TestMainBasicFunctions(t *testing.T) {
 	assert := assert.New(t)
 	initMainTest()
 	file, _ := os.Open(dbFile)
+	defer file.Close()
 
 	resp, _ := http.Get("http://127.0.0.1:8000/todos")
 
