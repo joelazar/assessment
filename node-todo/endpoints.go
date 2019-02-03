@@ -27,14 +27,15 @@ func initRouter() {
 func HttpGetAll(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET /todos received - query all todo items")
 	mutex.Lock()
+	defer mutex.Unlock()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(todos.getAll())
-	mutex.Unlock()
 }
 
 func HttpCreateTodo(w http.ResponseWriter, r *http.Request) {
 	log.Println("POST /todos received - try to create new todo item")
 	mutex.Lock()
+	defer mutex.Unlock()
 	var todo Todo
 	if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
 		http.Error(w, "Failed to decode request body.", http.StatusBadRequest)
@@ -48,13 +49,13 @@ func HttpCreateTodo(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(response)
-	mutex.Unlock()
 }
 
 func HttpGetTodo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Printf("GET /todos/%s received - look for given id in database", params["id"])
 	mutex.Lock()
+	defer mutex.Unlock()
 	response, err := todos.getById(params["id"])
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusNotFound)
@@ -62,13 +63,13 @@ func HttpGetTodo(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(response)
-	mutex.Unlock()
 }
 
 func HttpModifyTodo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Printf("PUT /todos/%s received - try to modify specific todo item", params["id"])
 	mutex.Lock()
+	defer mutex.Unlock()
 	var todo Todo
 	if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
 		http.Error(w, "Failed to decode request body.", http.StatusBadRequest)
@@ -84,18 +85,17 @@ func HttpModifyTodo(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(response)
-	mutex.Unlock()
 }
 
 func HttpDeleteTodo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Printf("DELETE /todos/%s received - delete specific todo from database", params["id"])
 	mutex.Lock()
+	defer mutex.Unlock()
 	err := todos.deleteById(params["id"])
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	mutex.Unlock()
 }
